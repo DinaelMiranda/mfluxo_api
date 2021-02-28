@@ -2,22 +2,20 @@ package com.dithec.mfluxo_api.model;
 
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 
 
-
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "categoria")
+@Data
 public class Categoria {
     @Id
-   @Getter @Setter private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-   @Getter @Setter private String nome;
+    private String nome;
 
 }
