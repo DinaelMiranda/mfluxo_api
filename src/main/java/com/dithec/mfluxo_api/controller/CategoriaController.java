@@ -2,6 +2,7 @@ package com.dithec.mfluxo_api.controller;
 
 import com.dithec.mfluxo_api.model.Categoria;
 import com.dithec.mfluxo_api.repository.CategoriaRepository;
+import com.dithec.mfluxo_api.services.exceptions.ResourceNotFoundException;
 import org.aspectj.bridge.MessageUtil;
 import org.hibernate.annotations.NotFound;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +27,12 @@ public class CategoriaController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Categoria> buscaCategoriaPorId(@PathVariable Long id, HttpServletResponse response) {
+//    public ResponseEntity<Categoria> buscaCategoriaPorId(@PathVariable Long id, HttpServletResponse response) {
+        public Categoria buscaCategoriaPorId(@PathVariable Long id, HttpServletResponse response) {
        Optional <Categoria> categoria = categoriaRepository.findById(id);
-        return categoria.isPresent() ? ResponseEntity.ok().body(categoria.get()) : ResponseEntity.notFound().build();
+//        return categoria.isPresent() ? ResponseEntity.ok().body(categoria.get()) : ResponseEntity.notFound().build();
+//        return ResponseEntity.ok().body(categoria.get());
+        return categoria.orElseThrow(() -> new ResourceNotFoundException(id));
     }
 
     @GetMapping
