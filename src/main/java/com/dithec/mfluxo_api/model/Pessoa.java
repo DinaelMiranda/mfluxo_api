@@ -1,24 +1,29 @@
 package com.dithec.mfluxo_api.model;
 
-import lombok.*;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
-
-@NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "categoria")
+@NoArgsConstructor
 @Data
-public class Categoria {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@Entity
+@Table(name = "pessoa")
+public class Pessoa {
 
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    private Long id;
     @NotNull
-    @Size(max = 50)
     private String nome;
+    @NotNull
+    private Boolean status;
+    @Embedded
+    private Endereco endereco;
+
 
 }
