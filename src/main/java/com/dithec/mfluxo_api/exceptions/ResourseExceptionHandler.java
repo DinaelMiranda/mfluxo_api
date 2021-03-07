@@ -4,6 +4,7 @@ import com.dithec.mfluxo_api.exceptions.customExceptionMessages.DataBaseExceptio
 import com.dithec.mfluxo_api.exceptions.customExceptionMessages.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @ControllerAdvice // Anotação que intercepta as excessões que acontecerem
 public class ResourseExceptionHandler extends ResponseEntityExceptionHandler {
@@ -58,11 +60,10 @@ public class ResourseExceptionHandler extends ResponseEntityExceptionHandler {
 
     }
 
-    // PUT com atributos da entidade invális(null onde é NOT NULL etc...)
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        String mensagemUsuario=null;
-        String mensagemDesenvolvedor=null;
+        String mensagemUsuario = null;
+        String mensagemDesenvolvedor = null;
         for (FieldError fieldError : ex.getBindingResult().getFieldErrors()) {
             mensagemUsuario = messageSource.getMessage(fieldError, null);
             mensagemDesenvolvedor = fieldError.toString();
@@ -72,6 +73,14 @@ public class ResourseExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ex, standardError, headers, status.BAD_REQUEST, request);
     }
 
+    // PUT com atributos da entidade inválidas(null onde é NOT NULL etc...)
+    @ExceptionHandler({EmptyResultDataAccessException.class})
+    public ResponseEntity<Object> handleEmptyResultDataAccessException(EmptyResultDataAccessException ex, WebRequest request) {
+        String mensagemUsuario = "Recurso Não encontrado!";
+        String mensagemDesenvolvedor = ex.toString();
+        List<StandardError> standardError = Arrays.asList(new StandardError(Instant.now(), HttpStatus.NOT_FOUND.value(), mensagemUsuario, mensagemDesenvolvedor, request.toString()));
+        return handleExceptionInternal(ex, standardError, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
+    }
 
 }
 

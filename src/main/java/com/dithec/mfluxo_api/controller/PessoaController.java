@@ -5,7 +5,7 @@ import com.dithec.mfluxo_api.exceptions.customExceptionMessages.DataBaseExceptio
 import com.dithec.mfluxo_api.exceptions.customExceptionMessages.ResourceNotFoundException;
 import com.dithec.mfluxo_api.model.Pessoa;
 import com.dithec.mfluxo_api.repository.PessoaRepository;
-import com.fasterxml.jackson.databind.util.BeanUtil;
+import com.dithec.mfluxo_api.services.PessoaService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -13,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.List;
@@ -25,10 +24,12 @@ public class PessoaController {
 
     private final ApplicationEventPublisher applicationEventPublisher;
     private final PessoaRepository pessoaRepository;
+    private final PessoaService pessoaService;
 
-    public PessoaController(ApplicationEventPublisher applicationEventPublisher, PessoaRepository pessoaRepository) {
+    public PessoaController(ApplicationEventPublisher applicationEventPublisher, PessoaRepository pessoaRepository, PessoaService pessoaService) {
         this.applicationEventPublisher = applicationEventPublisher;
         this.pessoaRepository = pessoaRepository;
+        this.pessoaService = pessoaService;
     }
 
     @GetMapping("/{id}")
@@ -62,16 +63,11 @@ public class PessoaController {
         }
     }
 
-    @PutMapping(value = "/{id}")
-    public ResponseEntity<Void> update(@RequestBody Pessoa obj, @PathVariable Long id) {
+    @PutMapping("/{id}")
+    public ResponseEntity<Pessoa> update(@Valid @RequestBody Pessoa obj, @PathVariable Long id) {
 
-        if (obj == null) {
-            throw new EmptyResultDataAccessException(1);
-        }
-        obj.setId(id);
-        pessoaRepository.save(obj);
-        return ResponseEntity.noContent().build();
+        Pessoa novaPessoa = pessoaService.updatePessoa(obj, id);
+        return novaPessoa != null ? ResponseEntity.ok(novaPessoa) : ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+
     }
-
-
 }
