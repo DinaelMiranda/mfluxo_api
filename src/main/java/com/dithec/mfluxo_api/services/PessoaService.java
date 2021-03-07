@@ -20,11 +20,25 @@ public class PessoaService {
 
     public Pessoa updatePessoa(Pessoa pessoa, Long id) {
 
+        Optional<Pessoa> pessoaSalva = getPessoa(id);
+        BeanUtils.copyProperties(pessoa, pessoaSalva, "id");
+        return pessoaRepository.save(pessoaSalva.get());
+    }
+
+
+    public void atualizaStatus(Long id, Boolean status) {
+
+        Optional<Pessoa> pessoaSalva = getPessoa(id);
+        pessoaSalva.get().setStatus(status);
+        pessoaRepository.save(pessoaSalva.get());
+    }
+
+    private Optional<Pessoa> getPessoa(Long id) {
+
         Optional<Pessoa> pessoaSalva = pessoaRepository.findById(id);
         if (pessoaSalva.isEmpty() || !pessoaSalva.isPresent()) {
             throw new EmptyResultDataAccessException(1);
         }
-        BeanUtils.copyProperties(pessoa, pessoaSalva, "id");
-        return pessoaRepository.save(pessoaSalva.get());
+        return pessoaSalva;
     }
 }

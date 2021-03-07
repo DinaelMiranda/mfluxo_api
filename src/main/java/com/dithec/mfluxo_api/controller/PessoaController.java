@@ -70,4 +70,9 @@ public class PessoaController {
         return novaPessoa != null ? ResponseEntity.ok(novaPessoa) : ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
     }
+
+    @PutMapping("/{id}/status")
+    public void updateStatus(@PathVariable Long id,@RequestBody Boolean status) {
+         pessoaService.atualizaStatus(id, status);
+    }
 }

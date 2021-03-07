@@ -53,8 +53,8 @@ public class ResourseExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         //String mensagemUsuario = messageSource.getMessage("mensagen.invalida", null, LocaleContextHolder.getLocale());
-        String mensagemUsuario = "O Json do obj requerido possue campos desconhecidos!";
-        String mensagemDesenvolvedor = ex.getCause().toString();
+        String mensagemUsuario = "O Json do obj requerido possue campo(s) desconhecido(s)!";
+        String mensagemDesenvolvedor = ex.getCause() != null ? ex.getCause().toString() : ex.toString();
         List<StandardError> standardError = Arrays.asList(new StandardError(Instant.now(), status.value(), mensagemUsuario, mensagemDesenvolvedor, request.toString()));
         return ResponseEntity.status(status).body(standardError);
 
@@ -77,7 +77,7 @@ public class ResourseExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler({EmptyResultDataAccessException.class})
     public ResponseEntity<Object> handleEmptyResultDataAccessException(EmptyResultDataAccessException ex, WebRequest request) {
         String mensagemUsuario = "Recurso Não encontrado!";
-        String mensagemDesenvolvedor = ex.toString();
+        String mensagemDesenvolvedor = ex.getCause() != null ? ex.getCause().toString() : ex.toString();
         List<StandardError> standardError = Arrays.asList(new StandardError(Instant.now(), HttpStatus.NOT_FOUND.value(), mensagemUsuario, mensagemDesenvolvedor, request.toString()));
         return handleExceptionInternal(ex, standardError, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
     }
